@@ -55,8 +55,10 @@ impl<W: AsyncWrite, E: Encode> Encoder<W, E> {
         self.writer.into_inner()
     }
 
-    pub fn poll_terminate(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<()>> {
-        self.do_poll_shutdown(cx)
+    pub fn poll_terminate(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<()>> {
+        ready!(self.as_mut().do_poll_shutdown(cx))?;
+        ready!(self.project().writer.as_mut().poll_flush(cx))?;
+        Poll::Ready(Ok(()))
     }
 
     fn do_poll_write(
@@ -96,9 +98,9 @@ impl<W: AsyncWrite, E: Encode> Encoder<W, E> {
             let mut output = PartialBuffer::new(output);
 
             let done = match this.state {
-                State::Encoding => this.encoder.flush(&mut output)?,
-
-                State::Finishing | State::Done => panic!("Flush after shutdown"),
+                _ => this.encoder.flush(&mut output)?,
+                // State::Encoding => this.encoder.flush(&mut output)?,
+                // State::Finishing | State::Done => panic!("Flush after shutdown"),
             };
 
             let produced = output.written().len();
