@@ -57,7 +57,6 @@ impl<W: AsyncWrite, E: Encode> Encoder<W, E> {
 
     pub fn poll_terminate(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<()>> {
         ready!(self.as_mut().do_poll_shutdown(cx))?;
-        ready!(self.project().writer.as_mut().poll_flush(cx))?;
         Poll::Ready(Ok(()))
     }
 
