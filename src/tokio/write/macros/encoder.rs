@@ -51,8 +51,8 @@ macro_rules! encoder {
                 self.inner.into_inner()
             }
 
-            pub fn poll_terminate(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<()>> {
-                self.inner.poll_terminate(cx)
+            pub fn poll_terminate(self: std::pin::Pin<&mut Self>, cx: &mut std::task::Context<'_>) -> std::task::Poll<std::io::Result<()>> {
+                self.project().inner.poll_terminate(cx)
             }
         }
 
