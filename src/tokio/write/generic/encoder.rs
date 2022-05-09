@@ -55,7 +55,7 @@ impl<W: AsyncWrite, E: Encode> Encoder<W, E> {
         self.writer.into_inner()
     }
 
-    pub fn poll_terminate(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<()>> {
+    pub fn poll_terminate(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<()>> {
         self.as_mut().do_poll_shutdown(cx)
     }
 

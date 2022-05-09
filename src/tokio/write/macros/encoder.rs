@@ -50,6 +50,10 @@ macro_rules! encoder {
             pub fn into_inner(self) -> $inner {
                 self.inner.into_inner()
             }
+
+            pub fn poll_terminate(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<()>> {
+                self.inner.poll_terminate(cx)
+            }
         }
 
         impl<$inner: tokio::io::AsyncWrite> tokio::io::AsyncWrite for $name<$inner> {
